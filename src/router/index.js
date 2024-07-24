@@ -14,7 +14,7 @@ import PaymentDone from "@/views/PaymentDone.vue"
 const routes = [
     {path: "/user/login", component: Login},
     {
-        path: "/",
+        path: "/onlineShopping",
         component: Home,
         // children: [
         //     {
