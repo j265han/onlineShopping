@@ -64,7 +64,7 @@ const rules = {
 }
 
 const home = async () => {
-  router.push('/')
+  router.push('/onlineShopping')
 }
 
 const register = async () => {
@@ -74,7 +74,7 @@ const register = async () => {
   const res = await userRegisterService(formModel.value)
   alert(res.message)
   isRegister.value = false
-  router.push('/login')
+  router.push('/onlineShopping/login')
 }
 
 const userStore = useUserStore()
@@ -95,7 +95,7 @@ const login = async () => {
     localStorage.setItem('username', formModel.value.username)
   }
 
-  router.push('/')
+  router.push('/onlineShopping')
 }
 
 

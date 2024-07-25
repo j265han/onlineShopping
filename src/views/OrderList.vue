@@ -17,7 +17,7 @@ const selectionData = JSON.parse(localStorage.getItem("selectedData"))
 const userInfo = JSON.parse(localStorage.getItem("userInfo"))
 const userId = userInfo[0].id;
 const homepage = async () => {
-  router.push("/")
+  router.push("/onlineShopping")
 }
 
 const stuList = {
@@ -27,7 +27,7 @@ const stuList = {
 }
 
 const MyCart = async () => {
-  router.push('/cart')
+  router.push('/onlineShopping/cart')
 }
 
 const handleCommand = async (key) => {
@@ -43,10 +43,10 @@ const handleCommand = async (key) => {
     localStorage.removeItem('token')
     localStorage.removeItem('username')
     localStorage.removeItem('userInfo')
-    router.push('/user/login')
+    router.push('/onlineShopping/user/login')
 
   } else {
-    router.push(`/user/${key}`)
+    router.push(`/onlineShopping/user/${key}`)
   }
 }
 
@@ -56,7 +56,7 @@ const getOrderDetail = async () => {
 
 const payment = async (orderId) => {
   localStorage.setItem('orderId', orderId)
-  router.push('/payment')
+  router.push('/onlineShopping/payment')
 }
 
 const cancelOrder = async (orderId) => {

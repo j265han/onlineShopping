@@ -29,11 +29,11 @@ const receiverInfo = ref({
 })
 
 const MyCart = async () => {
-  router.push('/cart')
+  router.push('/onlineShopping/cart')
 }
 
 const MyOrders = async () => {
-  router.push('/order/list')
+  router.push('/onlineShopping/order/list')
 }
 
 const getUserInfo = async () => {
@@ -63,10 +63,10 @@ const handleCommand = async (key) => {
     localStorage.removeItem('token')
     localStorage.removeItem('username')
     localStorage.removeItem('userInfo')
-    router.push('/user/login')
+    router.push('/onlineShopping/user/login')
 
   } else {
-    router.push(`/user/${key}`)
+    router.push(`/onlineShopping/user/${key}`)
   }
 }
 
@@ -95,7 +95,7 @@ const buildOrder = async () => {
 
 
   // localStorage.setItem('userInfo', JSON.stringify( receiverInfo.value))
-  router.push('/payment')
+  router.push('/onlineShopping/payment')
 }
 
 getCart()

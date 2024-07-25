@@ -30,11 +30,11 @@ const confirm = async () => {
     ElMessage.success(message)
   }
 
-  router.push('/')
+  router.push('/onlineShopping')
 }
 
 const home = async () => {
-  router.push('/')
+  router.push('/onlineShopping')
 }
 
 const rules = {

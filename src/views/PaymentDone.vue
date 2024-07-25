@@ -9,15 +9,15 @@ const router = useRouter()
 const username = localStorage.getItem("username")
 
 const homepage = async () => {
-  router.push("/")
+  router.push("/onlineShopping")
 }
 
 const MyCart = async () => {
-  router.push('/cart')
+  router.push('/onlineShopping/cart')
 }
 
 const MyOrders = async () => {
-  router.push('/order/list')
+  router.push('/onlineShopping/order/list')
 }
 
 const handleCommand = async (key) => {
@@ -33,10 +33,10 @@ const handleCommand = async (key) => {
     localStorage.removeItem('token')
     localStorage.removeItem('username')
     localStorage.removeItem('userInfo')
-    router.push('/user/login')
+    router.push('/onlineShopping/user/login')
 
   } else {
-    router.push(`/user/${key}`)
+    router.push(`/onlineShopping/user/${key}`)
   }
 }
 

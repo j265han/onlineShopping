@@ -19,7 +19,7 @@ const selectionData = ref()
 const dataLength = ref(0)
 
 const homepage = async () => {
-  router.push("/")
+  router.push("/onlineShopping")
 }
 
 const handleCommand = async (key) => {
@@ -35,10 +35,10 @@ const handleCommand = async (key) => {
     localStorage.removeItem('token')
     localStorage.removeItem('username')
     localStorage.removeItem('userInfo')
-    router.push('/user/login')
+    router.push('/onlineShopping/user/login')
 
   } else {
-    router.push(`/user/${key}`)
+    router.push(`/onlineShopping/user/${key}`)
   }
 }
 
@@ -48,7 +48,7 @@ const getCart = async () => {
 getCart()
 
 const MyOrders = async () => {
-  router.push('/order/list')
+  router.push('/onlineShopping/order/list')
 }
 
 const totalPrice = async () => {
@@ -82,7 +82,7 @@ const deleteOne = async (id) => {
 
 const toConfirmOrder = async () => {
   localStorage.setItem('selectedData', JSON.stringify(selectionData.value))
-  router.push('/confirmOrder')
+  router.push('/onlineShopping/confirmOrder')
 }
 
 function refreshWait(){

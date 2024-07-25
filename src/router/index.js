@@ -12,7 +12,7 @@ import OrderList from "@/views/OrderList.vue"
 import PaymentDone from "@/views/PaymentDone.vue"
 
 const routes = [
-    {path: "/user/login", component: Login},
+    {path: "/onlineShopping/user/login", component: Login},
     {
         path: "/onlineShopping",
         component: Home,
@@ -22,15 +22,15 @@ const routes = [
         //     }
         // ]
     },
-    {path: "/user/updatePwd", component: UpdatePwd},
-    {path: "/user/updateAddr", component: UpdateAddr},
-    {path: "/home/search/", component: SearchBar},
-    {path: "/goods/search/", component: Single},
-    {path: "/cart", component: Cart},
-    {path: "/confirmOrder", component: ConfirmOrder},
-    {path: "/payment", component: Payment},
-    {path: "/order/list", component: OrderList},
-    {path: "/paymentDone", component: PaymentDone},
+    {path: "/onlineShopping/user/updatePwd", component: UpdatePwd},
+    {path: "/onlineShopping/user/updateAddr", component: UpdateAddr},
+    {path: "/onlineShopping/home/search/", component: SearchBar},
+    {path: "/onlineShopping/goods/search/", component: Single},
+    {path: "/onlineShopping/cart", component: Cart},
+    {path: "/onlineShopping/confirmOrder", component: ConfirmOrder},
+    {path: "/onlineShopping/payment", component: Payment},
+    {path: "/onlineShopping/order/list", component: OrderList},
+    {path: "/onlineShopping/paymentDone", component: PaymentDone},
 ]
 
 const router = createRouter({

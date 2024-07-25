@@ -17,17 +17,17 @@ const selectionData = JSON.parse(localStorage.getItem("selectedData"))
 const userInfo = JSON.parse(localStorage.getItem("userInfo"))
 
 const MyCart = async () => {
-  router.push('/cart')
+  router.push('/onlineShopping/cart')
 }
 
 const pay = async () => {
   const status = 20
   await UpdateStatus({orderId , status})
-  router.push('/paymentDone')
+  router.push('/onlineShopping/paymentDone')
 }
 
 const MyOrders = async () => {
-  router.push('/order/list')
+  router.push('/onlineShopping/order/list')
 }
 
 const handleCommand = async (key) => {
@@ -43,10 +43,10 @@ const handleCommand = async (key) => {
     localStorage.removeItem('token')
     localStorage.removeItem('username')
     localStorage.removeItem('userInfo')
-    router.push('/user/login')
+    router.push('/onlineShopping/user/login')
 
   } else {
-    router.push(`/user/${key}`)
+    router.push(`/onlineShopping/user/${key}`)
   }
 }
 
@@ -66,7 +66,7 @@ const cancelOrder = async (orderId) => {
   const status=0
   await UpdateStatus({orderId , status})
   await getOrderDetail()
-  router.push("/confirmOrder")
+  router.push("/onlineShopping/confirmOrder")
 }
 totalPrice()
 getOrderDetail()

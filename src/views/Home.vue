@@ -35,15 +35,15 @@ const imgList = ref([
 
 const login = async () => {
   isLogin.value = true
-  router.push('/user/login')
+  router.push('/onlineShopping/user/login')
 }
 
 const MyCart = async () => {
-  router.push('/cart')
+  router.push('/onlineShopping/cart')
 }
 
 const MyOrders = async () => {
-  router.push('/order/list')
+  router.push('/onlineShopping/order/list')
 }
 
 const getUserInfo = async () => {
@@ -67,10 +67,10 @@ const handleCommand = async (key) => {
     localStorage.removeItem('token')
     localStorage.removeItem('username')
     localStorage.removeItem('userInfo')
-    router.push('/user/login')
+    router.push('/onlineShopping/user/login')
 
   } else {
-    router.push(`/user/${key}`)
+    router.push(`/onlineShopping/user/${key}`)
   }
 }
 
@@ -94,7 +94,7 @@ const searchNav = async (categoryName) => {
   searchName.value.name=null;
   const res = await SearchProductService(searchName.value)
 
-  router.push('/home/search')
+  router.push('/onlineShopping/home/search')
 
 }
 
@@ -102,12 +102,12 @@ const searchBar = async () => {
   searchName.value.categoryName=null;
   const res = await SearchProductService(searchName.value)
 
-  router.push('/home/search')
+  router.push('/onlineShopping/home/search')
 }
 
 const singleProduct = async (id) => {
   const res = await SearchSingleProduct({id})
-  router.push('/goods/search?id='+id)
+  router.push('/onlineShopping/goods/search?id='+id)
 }
 
 </script>

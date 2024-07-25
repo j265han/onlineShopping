@@ -27,15 +27,15 @@ const sku = ref(0)
 
 const login = async () => {
   isLogin.value = true
-  router.push('/user/login')
+  router.push('/onlineShopping/user/login')
 }
 
 const MyCart = async () => {
-  router.push('/cart')
+  router.push('/onlineShopping/cart')
 }
 
 const MyOrders = async () => {
-  router.push('/order/list')
+  router.push('/onlineShopping/order/list')
 }
 
 function refreshWait(){
@@ -59,16 +59,16 @@ const handleCommand = async (key) => {
     localStorage.removeItem('token')
     localStorage.removeItem('username')
     localStorage.removeItem('userInfo')
-    router.push('/user/login')
+    router.push('/onlineShopping/user/login')
 
   } else {
-    router.push(`/user/${key}`)
+    router.push(`/onlineShopping/user/${key}`)
   }
 }
 const searchBar = async () => {
   searchName.value.categoryName=null;
   const res = await SearchProductService(searchName.value)
-  router.push('/home/search')
+  router.push('/onlineShopping/home/search')
 
 }
 
@@ -101,7 +101,7 @@ const addCart = async () => {console.log(info.value.userId)
           center: true,
         }
     )
-        .then(()=>{router.push('/user/login')})
+        .then(()=>{router.push('/onlineShopping/user/login')})
         .catch()
 
   } else if (info.value.quantity > stock){
@@ -121,7 +121,7 @@ const addCart = async () => {console.log(info.value.userId)
               center: true,
             }
         )
-            .then(()=>{router.push('/cart')})
+            .then(()=>{router.push('/onlineShopping/cart')})
             .catch()
       }
   }
@@ -139,14 +139,14 @@ const toConfirmOrder = async () => {
           center: true,
         }
     )
-        .then(()=>{router.push('/user/login')})
+        .then(()=>{router.push('/onlineShopping/user/login')})
         .catch()
   } else if (info.value.quantity > stock) {
     ElMessage.error('Not Enough Stock')
   } else {
     mockData[sku.value].quantity = info.value.quantity
     localStorage.setItem('selectedData', JSON.stringify(Array(mockData[sku.value])))
-    router.push('/confirmOrder')
+    router.push('/onlineShopping/confirmOrder')
   }
 
 }
