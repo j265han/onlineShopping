@@ -66,7 +66,7 @@ const handleCommand = async (key) => {
     // 清除本地的数据 (token + user信息)
     localStorage.removeItem('token')
     userStore.token = ''
-    userStore.username = ''
+    userStore.username = null
     userStore.userInfo = []
     // localStorage.removeItem('userInfo')
     router.push('/onlineShopping/user/login')
