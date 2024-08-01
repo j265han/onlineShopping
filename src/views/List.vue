@@ -4,8 +4,9 @@ import {CaretBottom, EditPen, Search, SwitchButton} from "@element-plus/icons-vu
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {ElMessageBox} from "element-plus";
-import {SearchProductService, SearchSingleProduct} from "@/api/product.js";
 
+import {useProductStore} from "@/stores/index.js";
+const productStore = useProductStore()
 const router = useRouter()
 const isLogin = ref(false)
 const username = localStorage.getItem("username")
@@ -28,7 +29,7 @@ const MyOrders = async () => {
   router.push('/onlineShopping/order/list')
 }
 
-const mockData = JSON.parse(localStorage.getItem("searchResult"))
+const mockData = JSON.parse(JSON.stringify(productStore.searchResult))
 
 function refreshWait(){
   setTimeout(refresh,300)
@@ -60,14 +61,16 @@ const handleCommand = async (key) => {
 
 const searchBar = async () => {
   searchName.value.categoryName=null;
-  const res = await SearchProductService(searchName.value)
-
+  // const res = await SearchProductService(searchName.value)
+  await productStore.getSearchResult(searchName.value)
   router.push('/onlineShopping/home/search')
 
 }
 
 const singleProduct = async (id) => {
-  const res = await SearchSingleProduct({id})
+  // const res = await SearchSingleProduct({id})
+  await productStore.getSingleResult({id})
+  console.log(productStore.singleResult)
   router.push('/onlineShopping/goods/search?id='+id)
 }
 

@@ -5,8 +5,7 @@ import {userRegisterService, userLoginService} from "@/api/user.js";
 import {useRouter} from "vue-router";
 import {ElMessage} from "element-plus";
 import { useUserStore } from '@/stores'
-import {ConfirmInfo} from "@/api/cart.js";
-
+const userStore = useUserStore()
 const isRegister = ref(false)
 
 //获取整个表单的信息，进行统一的校验
@@ -19,17 +18,7 @@ const formModel = ref({
   password: '',
   // repassword: ''
 })
-// // 整个表单的校验规则
-// // 1. 非空校验 required: true      message消息提示，  trigger 触发校验的时机 blur change
-// // 2. 长度校验 min:xx, max: xx
-// // 3. 正则校验 pattern: 正则规则    \S 非空字符
-// // 4. 自定义校验 => 自己写逻辑校验 (校验函数)
-// //    validator: (rule, value, callback)
-// //    (1) rule  当前校验规则相关的信息
-// //    (2) value 所校验的表单元素目前的表单值
-// //    (3) callback 无论成功还是失败，都需要 callback 回调
-// //        - callback() 校验成功
-// //        - callback(new Error(错误信息)) 校验失败
+
 const rules = {
   username: [
     { required: true, message: 'Please enter the username', trigger: 'blur' },
@@ -68,8 +57,6 @@ const home = async () => {
 }
 
 const register = async () => {
-  // 注册成功之前，先进行校验，校验成功 → 请求，校验失败 → 自动提示
-  //validate（）是官网提供的方法，已经直接暴露，可以直接使用
   await form.value.validate()
   const res = await userRegisterService(formModel.value)
   alert(res.message)
@@ -77,7 +64,6 @@ const register = async () => {
   router.push('/onlineShopping/login')
 }
 
-const userStore = useUserStore()
 const router = useRouter()
 
 const login = async () => {
@@ -91,8 +77,10 @@ const login = async () => {
     ElMessage.error(message)
   } else {
     ElMessage.success(message)
+    userStore.token = data
+    userStore.username = formModel.value.username
     localStorage.setItem('token', data)
-    localStorage.setItem('username', formModel.value.username)
+    // localStorage.setItem('username', formModel.value.username)
   }
 
   router.push('/onlineShopping')

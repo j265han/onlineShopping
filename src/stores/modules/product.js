@@ -1,18 +1,17 @@
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 import {SearchProductService, SearchSingleProduct} from "@/api/product.js";
 
-export const useUserStore = defineStore(
-    'userInfo',{
-
+export const useProductStore = defineStore(
+    'productInfo',{
         state: () => {
             return {
-                token: '',
-                username: '',
-                userId: '',
-                userInfo: []
+                searchResult: [],
+                singleResult: []
             }
-        },
 
+
+        },
         actions: {
             async getSearchResult({categoryName, name}) {
                 const res = await SearchProductService({categoryName, name})
@@ -24,11 +23,11 @@ export const useUserStore = defineStore(
                 this.singleResult = res.data
             },
         },
-
         persist: {
-            key: 'userStore',
+            key: 'productStore',
             storage: sessionStorage,
             paths: null,
         },
     }
+
 )

@@ -4,9 +4,13 @@ import {CaretBottom, EditPen, SwitchButton} from "@element-plus/icons-vue";
 import {useRoute, useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
 import {ElMessageBox} from "element-plus";
-import {ConfirmInfo, DeleteOne, getCartPage} from "@/api/cart.js";
-import {BuildOrder, BuildOrderDirect} from "@/api/order.js";
 
+import { useUserStore } from '@/stores'
+import { useCartStore } from '@/stores'
+import { useOrderStore} from "@/stores";
+const orderStore = useOrderStore();
+const cartStore = useCartStore()
+const userStore = useUserStore()
 
 
 const router = useRouter()
@@ -14,11 +18,11 @@ const userId = localStorage.getItem("username")
 const cartList = JSON.parse(localStorage.getItem("cartList")) ;
 const cartTotalPrice= ref(0.0)
 const loading = ref(false)
-const selectionData = JSON.parse(localStorage.getItem("selectedData"))
+const selectionData = JSON.parse(JSON.stringify(cartStore.selectedData))
 const username = ref({
   username:userId
 })
-const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+const userInfo = JSON.parse(JSON.stringify(userStore.userInfo))
 const receiverInfo = ref({
   userId: userInfo[0].id,
   receiverName:userInfo[0].username,
@@ -36,11 +40,11 @@ const MyOrders = async () => {
   router.push('/onlineShopping/order/list')
 }
 
-const getUserInfo = async () => {
-  const {data} = await ConfirmInfo(username.value)
-  localStorage.setItem("userInfo",JSON.stringify(data))
-
-}
+// const getUserInfo = async () => {
+//   const {data} = await ConfirmInfo(username.value)
+//   localStorage.setItem("userInfo",JSON.stringify(data))
+//
+// }
 
 const getGoodId = async () => {
 
@@ -61,19 +65,21 @@ const handleCommand = async (key) => {
 
     // 清除本地的数据 (token + user信息)
     localStorage.removeItem('token')
-    localStorage.removeItem('username')
-    localStorage.removeItem('userInfo')
+    userStore.token = ''
+    userStore.username = ''
+    userStore.userInfo = []
+    // localStorage.removeItem('userInfo')
     router.push('/onlineShopping/user/login')
 
   } else {
     router.push(`/onlineShopping/user/${key}`)
   }
 }
-
-const getCart = async () => {
-  localStorage.getItem('selectedData')
-  await totalPrice()
-}
+//
+// const getCart = async () => {
+//   //localStorage.getItem('selectedData')
+//   await totalPrice()
+// }
 
 const totalPrice = async () => {
   cartTotalPrice.value = 0
@@ -85,12 +91,14 @@ const totalPrice = async () => {
 
 const buildOrder = async () => {
   if(selectionData[0].goodId!==null){
-    const {data} = await BuildOrder(receiverInfo.value)
-    localStorage.setItem('orderId', data)
+    // const {data} = await BuildOrder(receiverInfo.value)
+    // localStorage.setItem('orderId', data)
+    await orderStore.buildOrderGetId(receiverInfo.value)
   } else {
 
-    const {data} = await BuildOrderDirect(receiverInfo.value)
-    localStorage.setItem('orderId', data)
+    // const {data} = await BuildOrderDirect(receiverInfo.value)
+    // localStorage.setItem('orderId', data)
+    await orderStore.buildOrderDirectGetId(receiverInfo.value)
   }
 
 
@@ -98,8 +106,8 @@ const buildOrder = async () => {
   router.push('/onlineShopping/payment')
 }
 
-getCart()
-getUserInfo()
+totalPrice()
+// getUserInfo()
 getGoodId()
 onMounted(()=>{
 

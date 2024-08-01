@@ -15,23 +15,28 @@ import { ref } from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {ElMessage, ElMessageBox} from "element-plus";
 import {SearchProductService, SearchSingleProduct} from "@/api/product.js";
-import {ConfirmInfo} from "@/api/cart.js";
+import {ConfirmInfo} from "@/api/getCartPage.js";
 import carouselImg from "../assets/img_1.png";
-
+import {useProductStore} from "@/stores/index.js";
+const productStore = useProductStore()
+import { useUserStore } from '@/stores'
+const userStore = useUserStore()
+// const {searchResult} = storeToRefs(productStore)
 const router = useRouter()
 const route = useRoute()
 const isLogin = ref(false)
 const categoryName = ref({})
-const username = localStorage.getItem("username")
+const username = JSON.parse(JSON.stringify(userStore.username))
 const searchName = ref({
   categoryName:'',
   name:'',
 })
 
-const imgList = ref([
-  carouselImg,
-
-])
+const imgList = [
+  {src: new URL('../assets/img_1.png', import.meta.url).href},
+  {src: new URL('../assets/img_1.png', import.meta.url).href},
+  {src: new URL('../assets/img_1.png', import.meta.url).href},
+]
 
 const login = async () => {
   isLogin.value = true
@@ -46,10 +51,12 @@ const MyOrders = async () => {
   router.push('/onlineShopping/order/list')
 }
 
+
 const getUserInfo = async () => {
   if(username != null) {
     const {data} = await ConfirmInfo({username})
-    localStorage.setItem("userInfo",JSON.stringify(data))
+    // localStorage.setItem("userInfo",JSON.stringify(data))
+    userStore.userInfo = data
   }
 }
 getUserInfo()
@@ -65,8 +72,10 @@ const handleCommand = async (key) => {
 
     // 清除本地的数据 (token + user信息)
     localStorage.removeItem('token')
-    localStorage.removeItem('username')
-    localStorage.removeItem('userInfo')
+    userStore.token = ''
+    userStore.username = ''
+    userStore.userInfo = []
+    // localStorage.removeItem('userInfo')
     router.push('/onlineShopping/user/login')
 
   } else {
@@ -75,39 +84,53 @@ const handleCommand = async (key) => {
 }
 
 const created = async (categoryName) => {
-  localStorage.removeItem('searchResult')
+
   if (categoryName === null) {
     searchName.value.categoryName = null
   } else {
     searchName.value.categoryName = categoryName
   }
-  await SearchProductService(searchName.value)
+  // await SearchProductService(searchName.value)
+  await productStore.getSearchResult(searchName.value)
+
+
+
 }
+
+
+
 onMounted(()=>{
   created('')
+
 })
 
-const mockData = JSON.parse(localStorage.getItem("searchResult"))
+
+const mockData = JSON.parse(JSON.stringify(productStore.searchResult))
+
+// const mockData = JSON.parse(localStorage.getItem("searchResult"))
 
 const searchNav = async (categoryName) => {
   searchName.value.categoryName=categoryName;
   searchName.value.name=null;
-  const res = await SearchProductService(searchName.value)
+  // const res = await SearchProductService(searchName.value)
+  await productStore.getSearchResult(searchName.value)
 
-  router.push('/onlineShopping/home/search')
+ router.push('/onlineShopping/home/search')
 
 }
 
 const searchBar = async () => {
   searchName.value.categoryName=null;
-  const res = await SearchProductService(searchName.value)
-
+  // const res = await SearchProductService(searchName.value)
+  await productStore.getSearchResult(searchName.value)
   router.push('/onlineShopping/home/search')
 }
 
 const singleProduct = async (id) => {
-  const res = await SearchSingleProduct({id})
+  // const res = await SearchSingleProduct({id})
+  await productStore.getSingleResult({id})
   router.push('/onlineShopping/goods/search?id='+id)
+
 }
 
 </script>
@@ -199,7 +222,6 @@ const singleProduct = async (id) => {
                   <span >Electronics</span>
                 </template>
 
-
                 <el-sub-menu index="2-1">
                   <template #title>Computer</template>
                   <el-menu-item index="2-1-1" @click="searchNav('Laptop')">Laptop</el-menu-item>
@@ -225,9 +247,11 @@ const singleProduct = async (id) => {
           </el-scrollbar>
         </el-col>
         <el-col :span="15" style="margin: 22px 0px 0px 20px">
-          <el-carousel height="300px" type="card">
+          <el-carousel height="300px">
             <el-carousel-item v-for="item in imgList" :key="item">
-              <h3 class="small justify-center" text="2xl">{{ item }}</h3>
+              <h3 class="small justify-center" text="2xl">
+                <img :src="item.src" style="height: 100%; width:100%">
+              </h3>
             </el-carousel-item>
           </el-carousel>
         </el-col>
@@ -237,7 +261,6 @@ const singleProduct = async (id) => {
       <span > Suggested Items</span>
     </div>
     <el-row style="display: flex; justify-content: center; align-items: center;">
-
 
           <div id="app">
             <ul v-for="(item,index) in mockData" style="list-style-type:none; padding: 0">

@@ -4,14 +4,19 @@ import {CaretBottom, EditPen, SwitchButton} from "@element-plus/icons-vue";
 import {useRoute, useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
 import {ElMessageBox} from "element-plus";
-import {DeleteOne, getCartPage} from "@/api/cart.js";
-
+import {DeleteOne, GetCartPage} from "@/api/getCartPage.js";
+import {useProductStore} from "@/stores/index.js";
+import { useUserStore } from '@/stores'
+import { useCartStore } from '@/stores'
+const cartStore = useCartStore()
+const userStore = useUserStore()
+const productStore = useProductStore()
 
 const router = useRouter()
-const username = localStorage.getItem("username")
-const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+const username = JSON.parse(JSON.stringify(userStore.username))
+const userInfo = JSON.parse(JSON.stringify(userStore.userInfo))
 const userId = userInfo[0].id
-const cartList = JSON.parse(localStorage.getItem("cartList")) ;
+const cartList = JSON.parse(JSON.stringify(cartStore.cartList))
 const cartTotalPrice= ref(0.0)
 const isAllChecked = ref(false)
 const loading = ref(false)
@@ -33,8 +38,10 @@ const handleCommand = async (key) => {
 
     // 清除本地的数据 (token + user信息)
     localStorage.removeItem('token')
-    localStorage.removeItem('username')
-    localStorage.removeItem('userInfo')
+    userStore.token = ''
+    userStore.username = ''
+    userStore.userInfo = []
+    // localStorage.removeItem('userInfo')
     router.push('/onlineShopping/user/login')
 
   } else {
@@ -43,7 +50,9 @@ const handleCommand = async (key) => {
 }
 
 const getCart = async () => {
-  const res = await getCartPage({userId})
+  // const res = await GetCartPage({userId})
+  await cartStore.getCartList({userId})
+
 }
 getCart()
 
@@ -81,7 +90,8 @@ const deleteOne = async (id) => {
 }
 
 const toConfirmOrder = async () => {
-  localStorage.setItem('selectedData', JSON.stringify(selectionData.value))
+  // localStorage.setItem('selectedData', JSON.stringify(selectionData.value))
+  cartStore.selectedData = selectionData.value
   router.push('/onlineShopping/confirmOrder')
 }
 

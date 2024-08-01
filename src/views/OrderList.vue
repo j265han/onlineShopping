@@ -6,15 +6,20 @@ import {onMounted, ref} from "vue";
 import {ElMessageBox} from "element-plus";
 import { UpdateStatus, GetOrderList, DeleteOrder} from "@/api/order.js";
 import {CanceledError} from "axios";
-
+import { useUserStore } from '@/stores'
+import { useCartStore } from '@/stores'
+import { useOrderStore} from "@/stores";
+const orderStore = useOrderStore();
+const cartStore = useCartStore()
+const userStore = useUserStore()
 
 const router = useRouter()
-const username = localStorage.getItem("username")
-const orderDetail = JSON.parse(localStorage.getItem("orderList")) ;
+const username = JSON.parse(JSON.stringify(userStore.username))
+const orderDetail = JSON.parse(JSON.stringify(orderStore.orderList))
 const cartTotalPrice= ref(0.0)
 const loading = ref(false)
-const selectionData = JSON.parse(localStorage.getItem("selectedData"))
-const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+const selectionData = JSON.parse(JSON.stringify(cartStore.selectedData))
+const userInfo = JSON.parse(JSON.stringify(userStore.userInfo))
 const userId = userInfo[0].id;
 const homepage = async () => {
   router.push("/onlineShopping")
@@ -41,8 +46,10 @@ const handleCommand = async (key) => {
 
     // 清除本地的数据 (token + user信息)
     localStorage.removeItem('token')
-    localStorage.removeItem('username')
-    localStorage.removeItem('userInfo')
+    userStore.token = ''
+    userStore.username = ''
+    userStore.userInfo = []
+    // localStorage.removeItem('userInfo')
     router.push('/onlineShopping/user/login')
 
   } else {
@@ -51,11 +58,11 @@ const handleCommand = async (key) => {
 }
 
 const getOrderDetail = async () => {
-  await GetOrderList({userId})
+  await orderStore.getOrderList({userId})
 }
 
 const payment = async (orderId) => {
-  localStorage.setItem('orderId', orderId)
+  orderStore.orderId = orderId
   router.push('/onlineShopping/payment')
 }
 

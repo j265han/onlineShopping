@@ -5,16 +5,21 @@ import {useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
 import {ElMessageBox} from "element-plus";
 import {GetOrderDetail, GetOrderList, UpdateStatus} from "@/api/order.js";
-
+import { useUserStore } from '@/stores'
+import { useCartStore } from '@/stores'
+import { useOrderStore} from "@/stores";
+const orderStore = useOrderStore();
+const cartStore = useCartStore()
+const userStore = useUserStore()
 const router = useRouter()
-const username = localStorage.getItem("username")
-const orderDetail = Array(JSON.parse(localStorage.getItem("orderDetail"))) ;
-const orderId = localStorage.getItem("orderId")
+const username = JSON.parse(JSON.stringify(userStore.username))
+const orderDetail = Array(JSON.parse(JSON.stringify(orderStore.orderDetail)))
+const orderId = JSON.parse(JSON.stringify(orderStore.orderId))
 const cartTotalPrice= ref(0.0)
 const loading = ref(false)
-const selectionData = JSON.parse(localStorage.getItem("selectedData"))
-
-const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+// const selectionData = JSON.parse(localStorage.getItem("selectedData"))
+//
+// const userInfo = JSON.parse(localStorage.getItem("userInfo"))
 
 const MyCart = async () => {
   router.push('/onlineShopping/cart')
@@ -59,7 +64,7 @@ const totalPrice = async () => {
 }
 
 const getOrderDetail = async () => {
-  await GetOrderDetail({orderId})
+  await orderStore.getOrderDetail({orderId})
 }
 
 const cancelOrder = async (orderId) => {

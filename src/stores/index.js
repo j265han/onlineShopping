@@ -6,11 +6,7 @@ pinia.use(persist)
 
 export default pinia
 
-//实现了全部的输出，其他模块导入就方便了
-export * from './modules/user'
-// export * from './modules/counter'
-
-// import { useUserStore } from './modules/user'
-// export { useUserStore }
-// import { useCountStore } from './modules/counter'
-// export { useCountStore }
+export * from './modules/user.js'
+export * from './modules/product.js'
+export * from './modules/cart.js'
+export * from './modules/order.js'

@@ -4,9 +4,14 @@ import {CaretBottom, EditPen, SwitchButton} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
 import {ref} from "vue";
 import {ElMessageBox} from "element-plus";
-
+import { useUserStore } from '@/stores'
+import { useCartStore } from '@/stores'
+import { useOrderStore} from "@/stores";
+const orderStore = useOrderStore();
+const cartStore = useCartStore()
+const userStore = useUserStore()
 const router = useRouter()
-const username = localStorage.getItem("username")
+const username = JSON.parse(JSON.stringify(userStore.username))
 
 const homepage = async () => {
   router.push("/onlineShopping")
@@ -86,7 +91,7 @@ const handleCommand = async (key) => {
       <div class="cart-table-container">
         <div class="cart-filter-bar">
           <span class="switch-cart">Your Order is on the Way!</span>
-          <span class="switch-cart">Your Order is on the Way!</span>
+
         </div>
         <el-steps
             style="width: 100%; margin: 50px 0px 50px "

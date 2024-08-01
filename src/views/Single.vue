@@ -4,16 +4,18 @@ import {CaretBottom, EditPen, Search, SwitchButton} from "@element-plus/icons-vu
 import {onMounted, ref} from "vue";
 import {ElMessage, ElMessageBox} from "element-plus";
 import { SearchProductService} from "@/api/product.js";
-import {AddToCart, ConfirmInfo} from "@/api/cart.js"
+import {AddToCart, ConfirmInfo} from "@/api/getCartPage.js"
 import {useRouter} from "vue-router";
-
+import {useProductStore} from "@/stores/index.js";
+import { useUserStore } from '@/stores'
+import { useCartStore } from '@/stores'
+const cartStore = useCartStore()
+const userStore = useUserStore()
+const productStore = useProductStore()
 const router = useRouter()
 const isLogin = ref(false)
-const userId = localStorage.getItem("username")
-const userInfo = JSON.parse(localStorage.getItem("userInfo"))
-const username = ref({
-  username:userId
-})
+const username = JSON.parse(JSON.stringify(userStore.username))
+const userInfo = JSON.parse(JSON.stringify(userStore.userInfo))
 
 let num = ref(1)
 let loading = ref(true)
@@ -57,14 +59,17 @@ const handleCommand = async (key) => {
 
     // 清除本地的数据 (token + user信息)
     localStorage.removeItem('token')
-    localStorage.removeItem('username')
-    localStorage.removeItem('userInfo')
+    userStore.token = ''
+    userStore.username = ''
+    userStore.userInfo = []
+    // localStorage.removeItem('userInfo')
     router.push('/onlineShopping/user/login')
 
   } else {
     router.push(`/onlineShopping/user/${key}`)
   }
 }
+
 const searchBar = async () => {
   searchName.value.categoryName=null;
   const res = await SearchProductService(searchName.value)
@@ -79,7 +84,7 @@ onMounted(() => {
   }, 100)
 })
 
-const mockData = JSON.parse(localStorage.getItem("singleResult"))
+const mockData = JSON.parse(JSON.stringify(productStore.singleResult))
 
 const stock = mockData[0].stock
 const info = ref({
@@ -88,21 +93,20 @@ const info = ref({
   quantity:'1'
 })
 
-
-const addCart = async () => {console.log(info.value.userId)
-  if (localStorage.getItem('username')===null) {
+const addCart = async () => {
+  if (username===null) {
     ElMessageBox.confirm(
-        'Continue to Login?',
-        'You have to Login first',
-        {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-          type: 'warning',
-          center: true,
-        }
+      'Continue to Login?',
+      'You have to Login first',
+      {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning',
+        center: true,
+      }
     )
-        .then(()=>{router.push('/onlineShopping/user/login')})
-        .catch()
+      .then(()=>{router.push('/onlineShopping/user/login')})
+      .catch()
 
   } else if (info.value.quantity > stock){
     ElMessage.error('Not Enough Stock')
@@ -110,25 +114,25 @@ const addCart = async () => {console.log(info.value.userId)
     info.value.goodId = mockData[sku.value].id
     info.value.userId = userInfo[0].id
     const {code, data} = await AddToCart(info.value)
-      if(code === 1) {
-        ElMessageBox.confirm(
-            'Continue to Cart?',
-            data,
-            {
-              confirmButtonText: 'OK',
-              cancelButtonText: 'Cancel',
-              type: 'warning',
-              center: true,
-            }
-        )
-            .then(()=>{router.push('/onlineShopping/cart')})
-            .catch()
-      }
+    if(code === 1) {
+      ElMessageBox.confirm(
+        'Continue to Cart?',
+        data,
+        {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning',
+          center: true,
+        }
+      )
+        .then(()=>{router.push('/onlineShopping/cart')})
+        .catch()
+    }
   }
 }
 
 const toConfirmOrder = async () => {
-  if (localStorage.getItem('username')===null) {
+  if (username===null) {
     ElMessageBox.confirm(
         'Continue to Login?',
         'You have to Login first',
@@ -145,10 +149,9 @@ const toConfirmOrder = async () => {
     ElMessage.error('Not Enough Stock')
   } else {
     mockData[sku.value].quantity = info.value.quantity
-    localStorage.setItem('selectedData', JSON.stringify(Array(mockData[sku.value])))
+    cartStore.selectedData = Array(mockData[sku.value])
     router.push('/onlineShopping/confirmOrder')
   }
-
 }
 
 </script>
@@ -158,16 +161,15 @@ const toConfirmOrder = async () => {
     <el-header >
       <div>
         Hello! <strong>{{
-          userId
+          username
         }}</strong>
       </div>
 
-
       <div style="display: flex; align-items: center;">
-        <el-link v-if="userId===null" @click="login">Login </el-link>
-        <el-link  v-if="userId!==null" @click="MyCart">My Cart </el-link>&nbsp;&nbsp;&nbsp;&nbsp;
-        <el-link v-if="userId!==null" @click="MyOrders">My Orders </el-link>
-        <el-dropdown v-if="userId!==null" placement="bottom-end" @command="handleCommand"  >
+        <el-link v-if="username===null" @click="login">Login </el-link>
+        <el-link  v-if="username!==null" @click="MyCart">My Cart </el-link>&nbsp;&nbsp;&nbsp;&nbsp;
+        <el-link v-if="username!==null" @click="MyOrders">My Orders </el-link>
+        <el-dropdown v-if="username!==null" placement="bottom-end" @command="handleCommand"  >
           <!-- 展示给用户，默认看到的 -->
 
           <span class="el-dropdown__box">
