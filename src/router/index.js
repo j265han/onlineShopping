@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory} from "vue-router";
+import { createRouter, createWebHistory,createWebHashHistory} from "vue-router";
 import Login from "@/views/Login.vue";
 import Home from "@/views/Home.vue";
 import UpdatePwd from "@/views/user/UserUpdatePwd.vue"
@@ -12,6 +12,10 @@ import OrderList from "@/views/OrderList.vue"
 import PaymentDone from "@/views/PaymentDone.vue"
 
 const routes = [
+    {
+        path:'/',
+        redirect:'/onlineShopping'
+    },
     {path: "/onlineShopping/user/login", component: Login},
     {
         path: "/onlineShopping",
@@ -34,7 +38,7 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes: routes
 })
 

@@ -14,15 +14,15 @@ export const useUserStore = defineStore(
         },
 
         actions: {
-            async getSearchResult({categoryName, name}) {
-                const res = await SearchProductService({categoryName, name})
-                this.searchResult = res.data
-            },
-
-            async getSingleResult({id}) {
-                const res = await SearchSingleProduct({id})
-                this.singleResult = res.data
-            },
+            // async getSearchResult({categoryName, name}) {
+            //     const res = await SearchProductService({categoryName, name})
+            //     this.searchResult = res.data
+            // },
+            //
+            // async getSingleResult({id}) {
+            //     const res = await SearchSingleProduct({id})
+            //     this.singleResult = res.data
+            // },
         },
 
         persist: {

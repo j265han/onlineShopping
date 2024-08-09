@@ -27,7 +27,6 @@ const route = useRoute()
 const isLogin = ref(false)
 const categoryName = ref({})
 const username = JSON.parse(JSON.stringify(userStore.username))
-console.log(username)
 const searchName = ref({
   categoryName:'',
   name:'',
@@ -41,7 +40,11 @@ const imgList = [
 
 const login = async () => {
   isLogin.value = true
-  router.push('/onlineShopping/user/login')
+  const previousPath = route.fullPath;
+  router.push({
+    path: '/onlineShopping/user/login',
+    query: {redirect: previousPath}
+  })
 }
 
 const MyCart = async () => {
@@ -53,14 +56,14 @@ const MyOrders = async () => {
 }
 
 
-const getUserInfo = async () => {
-  if(username != null) {
-    const {data} = await ConfirmInfo({username})
-    // localStorage.setItem("userInfo",JSON.stringify(data))
-    userStore.userInfo = data
-  }
-}
-getUserInfo()
+// const getUserInfo = async () => {
+//   if(username !== '') {
+//     const {data} = await ConfirmInfo({username})
+//     // localStorage.setItem("userInfo",JSON.stringify(data))
+//     userStore.userInfo = data
+//   }
+// }
+// getUserInfo()
 
 const handleCommand = async (key) => {
   if (key === 'logout') {
@@ -74,7 +77,7 @@ const handleCommand = async (key) => {
     // 清除本地的数据 (token + user信息)
     localStorage.removeItem('token')
     userStore.token = ''
-    userStore.username = null
+    userStore.username = ''
     userStore.userInfo = []
     // localStorage.removeItem('userInfo')
     router.push('/onlineShopping/user/login')
@@ -147,10 +150,10 @@ const singleProduct = async (id) => {
 
 
       <div style="display: flex; align-items: center;">
-        <el-link v-if="username===null" @click="login">Login </el-link>
-        <el-link v-if="username!==null" @click="MyCart">My Cart </el-link>&nbsp;&nbsp;&nbsp;&nbsp;
-        <el-link v-if="username!==null" @click="MyOrders">My Orders </el-link>
-        <el-dropdown v-if="username!==null" placement="bottom-end" @command="handleCommand"  >
+        <el-link v-if="username===''" @click="login">Login </el-link>
+        <el-link v-if="username!==''" @click="MyCart">My Cart </el-link>&nbsp;&nbsp;&nbsp;&nbsp;
+        <el-link v-if="username!==''" @click="MyOrders">My Orders </el-link>
+        <el-dropdown v-if="username!==''" placement="bottom-end" @command="handleCommand"  >
           <!-- 展示给用户，默认看到的 -->
 
           <span class="el-dropdown__box">
@@ -250,9 +253,7 @@ const singleProduct = async (id) => {
         <el-col :span="15" style="margin: 22px 0px 0px 20px">
           <el-carousel height="300px">
             <el-carousel-item v-for="item in imgList" :key="item">
-              <h3 class="small justify-center" text="2xl">
                 <img :src="item.src" style="height: 100%; width:100%">
-              </h3>
             </el-carousel-item>
           </el-carousel>
         </el-col>

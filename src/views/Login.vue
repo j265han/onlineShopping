@@ -2,10 +2,12 @@
 import { User, Lock } from '@element-plus/icons-vue'
 import { ref, watch } from 'vue'
 import {userRegisterService, userLoginService} from "@/api/user.js";
-import {useRouter} from "vue-router";
+import {useRouter, useRoute} from "vue-router";
 import {ElMessage} from "element-plus";
-import { useUserStore } from '@/stores'
+import {useProductStore, useUserStore} from '@/stores'
+import {ConfirmInfo} from "@/api/getCartPage.js";
 const userStore = useUserStore()
+const productStore = useProductStore()
 const isRegister = ref(false)
 
 //获取整个表单的信息，进行统一的校验
@@ -53,7 +55,9 @@ const rules = {
 }
 
 const home = async () => {
-  router.push('/onlineShopping')
+  const redirectPath = route.query.redirect || '/';
+  router.push(redirectPath)
+  // router.push('/onlineShopping')
 }
 
 const register = async () => {
@@ -65,6 +69,7 @@ const register = async () => {
 }
 
 const router = useRouter()
+const route = useRoute()
 
 const login = async () => {
   await form.value.validate()
@@ -73,17 +78,28 @@ const login = async () => {
   // alert(res.message)
 
   const {code, data, message} = await userLoginService(formModel.value)
+  let token = data
   if(code === 0){
     ElMessage.error(message)
   } else {
     ElMessage.success(message)
-    userStore.token = data
+    userStore.token = token
     userStore.username = formModel.value.username
-    localStorage.setItem('token', data)
+    localStorage.setItem('token', token)
+    const {data } = await ConfirmInfo({ username: JSON.parse(formModel.value.username)})
+    // // localStorage.setItem("userInfo",JSON.stringify(data))
+    userStore.userInfo = data
     // localStorage.setItem('username', formModel.value.username)
   }
+  const redirectPath = route.query.redirect || '/';
+  router.push(redirectPath)
+  // if (productStore.singleResult != null){
+  //
+  //   router.push(`/onlineShopping/goods/search?id=${productStore.singleResult[0].id}`)
+  // } else {
+  //   router.push('/onlineShopping')
+  // }
 
-  router.push('/onlineShopping')
 }
 
 

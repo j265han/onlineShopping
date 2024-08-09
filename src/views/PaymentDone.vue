@@ -37,7 +37,7 @@ const handleCommand = async (key) => {
     // 清除本地的数据 (token + user信息)
     localStorage.removeItem('token')
     userStore.token = ''
-    userStore.username = null
+    userStore.username = ''
     userStore.userInfo = []
     // localStorage.removeItem('userInfo')
     router.push('/onlineShopping/user/login')
@@ -59,9 +59,9 @@ const handleCommand = async (key) => {
         }}</strong>
       </div>
       <div style="display: flex; align-items: center;">
-        <el-link v-if="username!==null" @click="MyCart">My Cart </el-link>&nbsp;&nbsp;&nbsp;&nbsp;
-        <el-link v-if="username!==null" @click="MyOrders">My Orders </el-link>
-        <el-dropdown v-if="userId!==null" placement="bottom-end" @command="handleCommand"  >
+        <el-link v-if="username!==''" @click="MyCart">My Cart </el-link>&nbsp;&nbsp;&nbsp;&nbsp;
+        <el-link v-if="username!==''" @click="MyOrders">My Orders </el-link>
+        <el-dropdown v-if="username!==''" placement="bottom-end" @command="handleCommand"  >
           <!-- 展示给用户，默认看到的 -->
 
           <span class="el-dropdown__box">

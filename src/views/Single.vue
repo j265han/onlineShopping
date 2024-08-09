@@ -5,7 +5,7 @@ import {onMounted, ref} from "vue";
 import {ElMessage, ElMessageBox} from "element-plus";
 import { SearchProductService} from "@/api/product.js";
 import {AddToCart, ConfirmInfo} from "@/api/getCartPage.js"
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {useProductStore} from "@/stores/index.js";
 import { useUserStore } from '@/stores'
 import { useCartStore } from '@/stores'
@@ -13,6 +13,7 @@ const cartStore = useCartStore()
 const userStore = useUserStore()
 const productStore = useProductStore()
 const router = useRouter()
+const route = useRoute()
 const isLogin = ref(false)
 const username = JSON.parse(JSON.stringify(userStore.username))
 const userInfo = JSON.parse(JSON.stringify(userStore.userInfo))
@@ -29,7 +30,11 @@ const sku = ref(0)
 
 const login = async () => {
   isLogin.value = true
-  router.push('/onlineShopping/user/login')
+  const previousPath = route.fullPath;
+  router.push({
+    path: '/onlineShopping/user/login',
+    query: {redirect: previousPath}
+  })
 }
 
 const MyCart = async () => {
@@ -60,7 +65,7 @@ const handleCommand = async (key) => {
     // 清除本地的数据 (token + user信息)
     localStorage.removeItem('token')
     userStore.token = ''
-    userStore.username = null
+    userStore.username = ''
     userStore.userInfo = []
     // localStorage.removeItem('userInfo')
     router.push('/onlineShopping/user/login')
@@ -94,7 +99,7 @@ const info = ref({
 })
 
 const addCart = async () => {
-  if (username===null) {
+  if (username==='') {
     ElMessageBox.confirm(
       'Continue to Login?',
       'You have to Login first',
@@ -105,8 +110,14 @@ const addCart = async () => {
         center: true,
       }
     )
-      .then(()=>{router.push('/onlineShopping/user/login')})
-      .catch()
+      .then(()=>{
+        const previousPath = route.fullPath;
+        router.push({
+          path: '/onlineShopping/user/login',
+          query: { redirect: previousPath }
+        })
+      })
+      .catch(()=>{refresh()})
 
   } else if (info.value.quantity > stock){
     ElMessage.error('Not Enough Stock')
@@ -126,13 +137,13 @@ const addCart = async () => {
         }
       )
         .then(()=>{router.push('/onlineShopping/cart')})
-        .catch()
+        .catch(()=>{refresh()})
     }
   }
 }
 
 const toConfirmOrder = async () => {
-  if (username===null) {
+  if (username==='') {
     ElMessageBox.confirm(
         'Continue to Login?',
         'You have to Login first',
@@ -143,8 +154,16 @@ const toConfirmOrder = async () => {
           center: true,
         }
     )
-        .then(()=>{router.push('/onlineShopping/user/login')})
-        .catch()
+        .then(()=> {
+          const previousPath = route.fullPath;
+          router.push({
+            path: '/onlineShopping/user/login',
+            query: {redirect: previousPath}
+          })
+              .catch(() => {
+                refresh()
+              })
+        })
   } else if (info.value.quantity > stock) {
     ElMessage.error('Not Enough Stock')
   } else {
@@ -166,10 +185,10 @@ const toConfirmOrder = async () => {
       </div>
 
       <div style="display: flex; align-items: center;">
-        <el-link v-if="username===null" @click="login">Login </el-link>
-        <el-link  v-if="username!==null" @click="MyCart">My Cart </el-link>&nbsp;&nbsp;&nbsp;&nbsp;
-        <el-link v-if="username!==null" @click="MyOrders">My Orders </el-link>
-        <el-dropdown v-if="username!==null" placement="bottom-end" @command="handleCommand"  >
+        <el-link v-if="username===''" @click="login">Login </el-link>
+        <el-link  v-if="username!==''" @click="MyCart">My Cart </el-link>&nbsp;&nbsp;&nbsp;&nbsp;
+        <el-link v-if="username!==''" @click="MyOrders">My Orders </el-link>
+        <el-dropdown v-if="username!==''" placement="bottom-end" @command="handleCommand"  >
           <!-- 展示给用户，默认看到的 -->
 
           <span class="el-dropdown__box">
