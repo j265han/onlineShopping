@@ -6,12 +6,14 @@ import { useRouter, useRoute } from 'vue-router'
 import {ElMessageBox} from "element-plus";
 
 import {useProductStore} from "@/stores/index.js";
+import { useImageStore } from '@/stores/index.js';
+const imageStore = useImageStore();
 const productStore = useProductStore()
 const router = useRouter()
 const route = useRoute()
 const isLogin = ref(false)
 const username = localStorage.getItem("username")
-
+const imgList = imageStore.imgList;
 const searchName = ref({
   categoryName:'',
   name:'',
@@ -24,6 +26,10 @@ const login = async () => {
     path: '/onlineShopping/user/login',
     query: {redirect: previousPath}
   })
+}
+
+const Home = async () => {
+  router.push('/onlineShopping')
 }
 
 const MyCart = async () => {
@@ -76,8 +82,11 @@ const searchBar = async () => {
 const singleProduct = async (id) => {
   // const res = await SearchSingleProduct({id})
   await productStore.getSingleResult({id})
-  console.log(productStore.singleResult)
-  router.push('/onlineShopping/goods/search?id='+id)
+  const previousPath = route.fullPath;
+  router.push({
+    path: '/onlineShopping/goods/search?id='+id,
+    query: {redirect: previousPath}
+  })
 }
 
 </script>
@@ -90,7 +99,7 @@ const singleProduct = async (id) => {
           username
         }}</strong>
       </div>
-
+      <img src="../assets/logo.png" @click="Home" :style="{ width: 'auto', height: '70px' }" >
       <div style="display: flex; align-items: center;">
         <el-link v-if="username===''" @click="login">Login </el-link>
         <el-link v-if="username!==''" @click="MyCart">My Cart </el-link>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -140,7 +149,7 @@ const singleProduct = async (id) => {
     <el-row style="margin-top: 20px">
       <ul v-for="(item,index) in mockData" style="list-style-type:none; padding: 0">
         <li class="item" @click="singleProduct(item.id)">
-          <div class="img_box"><img v-bind:src="item.picture" alt=""></div>
+          <div class="img_box"><img v-bind:src="imgList[item.id].src" alt=""></div>
           <p v-html="item.name"></p>
           <span >&dollar;{{item.price}}</span>
         </li>

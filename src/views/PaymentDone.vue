@@ -58,6 +58,7 @@ const handleCommand = async (key) => {
           username
         }}</strong>
       </div>
+      <img src="../assets/logo.png" @click="homepage" :style="{ width: 'auto', height: '70px' }" >
       <div style="display: flex; align-items: center;">
         <el-link v-if="username!==''" @click="MyCart">My Cart </el-link>&nbsp;&nbsp;&nbsp;&nbsp;
         <el-link v-if="username!==''" @click="MyOrders">My Orders </el-link>

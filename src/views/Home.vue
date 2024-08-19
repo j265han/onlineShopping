@@ -1,26 +1,15 @@
 <script setup>
-import {
-  Document,
+import {CaretBottom, EditPen, Menu as IconMenu, Search, SwitchButton} from '@element-plus/icons-vue'
 
-  Menu as IconMenu,
-  Location,
-  Setting,
-  EditPen,
-  SwitchButton,
-  CaretBottom, Search
-} from '@element-plus/icons-vue'
-
-import {onMounted, reactive, watch} from 'vue'
-import { ref } from 'vue'
+import {onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import {ElMessage, ElMessageBox} from "element-plus";
-import {SearchProductService, SearchSingleProduct} from "@/api/product.js";
-import {ConfirmInfo} from "@/api/getCartPage.js";
-import carouselImg from "../assets/img_1.png";
-import {useProductStore} from "@/stores/index.js";
+import {ElMessageBox} from "element-plus";
+import {useImageStore, useProductStore} from "@/stores/index.js";
+import {useUserStore} from '@/stores'
+
 const productStore = useProductStore()
-import { useUserStore } from '@/stores'
 const userStore = useUserStore()
+const imageStore = useImageStore();
 // const {searchResult} = storeToRefs(productStore)
 const router = useRouter()
 const route = useRoute()
@@ -32,10 +21,12 @@ const searchName = ref({
   name:'',
 })
 
-const imgList = [
-  {src: new URL('../assets/img_1.png', import.meta.url).href},
-  {src: new URL('../assets/img_1.png', import.meta.url).href},
-  {src: new URL('../assets/img_1.png', import.meta.url).href},
+const imgList = imageStore.imgList;
+const isLoading = ref(true)
+const carouselList = [
+  {src: new URL('../assets/2B_pencil.png', import.meta.url).href},
+  {src: new URL('../assets/pen.png', import.meta.url).href},
+  {src: new URL('../assets/pencil.png', import.meta.url).href},
 ]
 
 const login = async () => {
@@ -86,7 +77,7 @@ const handleCommand = async (key) => {
     router.push(`/onlineShopping/user/${key}`)
   }
 }
-
+const mockData = ref([])
 const created = async (categoryName) => {
 
   if (categoryName === null) {
@@ -97,8 +88,9 @@ const created = async (categoryName) => {
   // await SearchProductService(searchName.value)
   await productStore.getSearchResult(searchName.value)
 
-
-
+  mockData.value = JSON.parse(JSON.stringify(productStore.searchResult))
+  isLoading.value=false
+  console.log(mockData)
 }
 
 
@@ -109,7 +101,7 @@ onMounted(()=>{
 })
 
 
-const mockData = JSON.parse(JSON.stringify(productStore.searchResult))
+
 
 // const mockData = JSON.parse(localStorage.getItem("searchResult"))
 
@@ -133,13 +125,22 @@ const searchBar = async () => {
 const singleProduct = async (id) => {
   // const res = await SearchSingleProduct({id})
   await productStore.getSingleResult({id})
-  router.push('/onlineShopping/goods/search?id='+id)
+  // router.push('/onlineShopping/goods/search?id='+id)
+  const previousPath = route.fullPath;
+  router.push({
+    path: '/onlineShopping/goods/search?id='+id,
+    query: {redirect: previousPath}
+  })
+
 
 }
 
 </script>
 
 <template>
+  <div v-if="isLoading" class="loading-container">
+    <div class="loader"></div>
+  </div>
   <el-container class="layout-container">
     <el-header >
       <div>
@@ -148,6 +149,7 @@ const singleProduct = async (id) => {
         }}</strong>
       </div>
 
+      <img src="../assets/logo.png" @click="Home" :style="{ width: 'auto', height: '70px' }" >
 
       <div style="display: flex; align-items: center;">
         <el-link v-if="username===''" @click="login">Login </el-link>
@@ -184,7 +186,7 @@ const singleProduct = async (id) => {
 
     <!--路由来填充-->
 <!--    <el-main>-->
-      <el-row>
+      <el-row style=" margin-top: 10px">
         <el-container class="search">
           <el-input
               v-model="searchName.name"
@@ -252,7 +254,7 @@ const singleProduct = async (id) => {
         </el-col>
         <el-col :span="15" style="margin: 22px 0px 0px 20px">
           <el-carousel height="300px">
-            <el-carousel-item v-for="item in imgList" :key="item">
+            <el-carousel-item v-for="item in carouselList" :key="item">
                 <img :src="item.src" style="height: 100%; width:100%">
             </el-carousel-item>
           </el-carousel>
@@ -267,7 +269,7 @@ const singleProduct = async (id) => {
           <div id="app">
             <ul v-for="(item,index) in mockData" style="list-style-type:none; padding: 0">
               <li class="item" @click="singleProduct(item.id)">
-                <div class="img_box"><img v-bind:src="item.picture" alt=""></div>
+                <div class="img_box"><img v-bind:src="imgList[item.id].src" alt=""></div>
                 <p v-html="item.name"></p>
                 <span >&dollar;{{item.price}}</span>
               </li>
@@ -284,7 +286,26 @@ const singleProduct = async (id) => {
 </template>
 
 <style lang="scss" scoped>
+@keyframes spinner {
+  to { transform: rotate(360deg); }
+}
 
+.loader {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #3eaf7c; /* Customize the color */
+  border-radius: 50%;
+  animation: spinner 1s linear infinite;
+  margin: 100px auto; /* Center the spinner */
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full height of the viewport */
+}
 .layout-container {
   height: 100vh;
   margin:50px 150px 0px 150px;

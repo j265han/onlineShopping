@@ -8,15 +8,18 @@ import {DeleteOne, GetCartPage} from "@/api/getCartPage.js";
 import {useProductStore} from "@/stores/index.js";
 import { useUserStore } from '@/stores'
 import { useCartStore } from '@/stores'
+import { useImageStore } from '@/stores/index.js';
+const imageStore = useImageStore();
+const imgList = imageStore.imgList;
 const cartStore = useCartStore()
 const userStore = useUserStore()
 const productStore = useProductStore()
-
+const isLoading = ref(true)
 const router = useRouter()
 const username = JSON.parse(JSON.stringify(userStore.username))
 const userInfo = JSON.parse(JSON.stringify(userStore.userInfo))
 const userId = userInfo[0].id
-const cartList = JSON.parse(JSON.stringify(cartStore.cartList))
+const cartList = ref([])
 const cartTotalPrice= ref(0.0)
 const isAllChecked = ref(false)
 const loading = ref(false)
@@ -52,9 +55,9 @@ const handleCommand = async (key) => {
 const getCart = async () => {
   // const res = await GetCartPage({userId})
   await cartStore.getCartList({userId})
-
+  cartList.value = JSON.parse(JSON.stringify(cartStore.cartList))
+  isLoading.value = false
 }
-getCart()
 
 const MyOrders = async () => {
   router.push('/onlineShopping/order/list')
@@ -105,16 +108,16 @@ function refresh(){
 
 onMounted(()=>{
 
-  if (location.href.indexOf("#reloaded") === -1) {
-    location.href = location.href + "#reloaded";
-    refreshWait()
-  }
+  getCart()
 })
 
 
 </script>
 
 <template>
+  <div v-if="isLoading" class="loading-container">
+    <div class="loader"></div>
+  </div>
   <el-container class="layout-container">
     <el-header >
       <div>
@@ -122,6 +125,7 @@ onMounted(()=>{
           username
         }}</strong>
       </div>
+      <img src="../assets/logo.png" @click="homepage" :style="{ width: 'auto', height: '70px' }" >
         <div style="display: flex; align-items: center;">&nbsp;&nbsp;&nbsp;&nbsp;
           <el-link v-if="username!==''" @click="MyOrders">My Orders </el-link>
           <el-dropdown v-if="username!==''" placement="bottom-end" @command="handleCommand"  >
@@ -175,18 +179,18 @@ onMounted(()=>{
             <el-table-column label="Picture" width="180">
               <template v-slot:default="scope">
                 <el-image
-                    src="../assets/img_1.png"
+                    :src="imgList[scope.row.goodId].src"
                     style="width: 120px; height: 120px"
                 >
-                  <div slot="placeholder" class="image-slot">
-                    Loading<span class="dot">...</span>
-                  </div>
-                  <div slot="error" class="image-slot">
-                    <el-image
-                        style="width: 120px; height: 120px"
-                        src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"
-                    ></el-image>
-                  </div>
+<!--                  <div slot="placeholder" class="image-slot">-->
+<!--                    Loading<span class="dot">...</span>-->
+<!--                  </div>-->
+<!--                  <div slot="error" class="image-slot">-->
+<!--                    <el-image-->
+<!--                        style="width: 120px; height: 120px"-->
+<!--                        src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"-->
+<!--                    ></el-image>-->
+<!--                  </div>-->
                 </el-image>
               </template>
             </el-table-column>
@@ -261,6 +265,26 @@ onMounted(()=>{
 </template>
 
 <style scoped>
+@keyframes spinner {
+  to { transform: rotate(360deg); }
+}
+
+.loader {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #3eaf7c; /* Customize the color */
+  border-radius: 50%;
+  animation: spinner 1s linear infinite;
+  margin: 100px auto; /* Center the spinner */
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full height of the viewport */
+}
 .layout-container {
   height: 100vh;
   margin: 0px 150px 0px 150px;

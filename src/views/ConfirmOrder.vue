@@ -8,11 +8,14 @@ import {ElMessageBox} from "element-plus";
 import { useUserStore } from '@/stores'
 import { useCartStore } from '@/stores'
 import { useOrderStore} from "@/stores";
+import { useImageStore } from '@/stores/index.js';
+const imageStore = useImageStore();
+const imgList = imageStore.imgList;
 const orderStore = useOrderStore();
 const cartStore = useCartStore()
 const userStore = useUserStore()
 
-
+const isLoading = ref(true)
 const router = useRouter()
 const userId = localStorage.getItem("username")
 const cartList = JSON.parse(localStorage.getItem("cartList")) ;
@@ -31,6 +34,10 @@ const receiverInfo = ref({
   quantity:selectionData[0].quantity,
   goodId:[]
 })
+
+const Home = async () => {
+  router.push('/onlineShopping')
+}
 
 const MyCart = async () => {
   router.push('/onlineShopping/cart')
@@ -52,7 +59,7 @@ const getGoodId = async () => {
     receiverInfo.value.goodId[index]=item.specList[0].goodsId
 
   })
-
+  isLoading.value = false
 }
 
 const handleCommand = async (key) => {
@@ -108,19 +115,18 @@ const buildOrder = async () => {
 
 totalPrice()
 // getUserInfo()
-getGoodId()
-onMounted(()=>{
 
-  if (location.href.indexOf("#reloaded") === -1) {
-    location.href = location.href + "#reloaded";
-    location.reload();
-  }
+onMounted(()=>{
+  getGoodId()
 })
 
 
 </script>
 
 <template>
+  <div v-if="isLoading" class="loading-container">
+    <div class="loader"></div>
+  </div>
   <el-container class="layout-container">
     <el-header>
       <div>
@@ -128,6 +134,7 @@ onMounted(()=>{
           userId
         }}</strong>
       </div>
+      <img src="../assets/logo.png" @click="Home" :style="{ width: 'auto', height: '70px' }" >
       <div style="display: flex; align-items: center;">
         <el-link v-if="userId!==''" @click="MyCart">My Cart </el-link>&nbsp;&nbsp;&nbsp;&nbsp;
         <el-link v-if="userId!==''" @click="MyOrders">My Orders </el-link>
@@ -238,18 +245,9 @@ onMounted(()=>{
             <el-table-column label="Picture" width="180">
               <template v-slot:default="scope">
                 <el-image
-                    src="../assets/img_1.png"
+                    :src="imgList[scope.row.goodId].src"
                     style="width: 120px; height: 120px"
                 >
-                  <div slot="placeholder" class="image-slot">
-                    Loading<span class="dot">...</span>
-                  </div>
-                  <div slot="error" class="image-slot">
-                    <el-image
-                        style="width: 120px; height: 120px"
-                        src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"
-                    ></el-image>
-                  </div>
                 </el-image>
               </template>
             </el-table-column>
@@ -287,6 +285,26 @@ onMounted(()=>{
 </template>
 
 <style scoped>
+@keyframes spinner {
+  to { transform: rotate(360deg); }
+}
+
+.loader {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #3eaf7c; /* Customize the color */
+  border-radius: 50%;
+  animation: spinner 1s linear infinite;
+  margin: 100px auto; /* Center the spinner */
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full height of the viewport */
+}
 .layout-container {
   height: 100vh;
   margin: 0px 150px 0px 150px;

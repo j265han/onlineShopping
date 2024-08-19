@@ -2,20 +2,23 @@
 
 import {CaretBottom, Close, CloseBold, Delete, EditPen, Money, SwitchButton} from "@element-plus/icons-vue";
 import {useRoute, useRouter} from "vue-router";
-import {onMounted, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {ElMessageBox} from "element-plus";
 import { UpdateStatus, GetOrderList, DeleteOrder} from "@/api/order.js";
 import {CanceledError} from "axios";
 import { useUserStore } from '@/stores'
 import { useCartStore } from '@/stores'
 import { useOrderStore} from "@/stores";
+import { useImageStore } from '@/stores/index.js';
+const imageStore = useImageStore();
+const imgList = imageStore.imgList;
 const orderStore = useOrderStore();
 const cartStore = useCartStore()
 const userStore = useUserStore()
-
+const isLoading = ref(true)
 const router = useRouter()
 const username = JSON.parse(JSON.stringify(userStore.username))
-const orderDetail = JSON.parse(JSON.stringify(orderStore.orderList))
+const orderDetail = ref([])
 const cartTotalPrice= ref(0.0)
 const loading = ref(false)
 const selectionData = JSON.parse(JSON.stringify(cartStore.selectedData))
@@ -59,6 +62,10 @@ const handleCommand = async (key) => {
 
 const getOrderDetail = async () => {
   await orderStore.getOrderList({userId})
+
+  orderDetail.value = orderStore.orderList
+  isLoading.value = false
+  // console.log(orderDetail)
 }
 
 const payment = async (orderId) => {
@@ -97,27 +104,19 @@ const totalPrice = async () => {
   })
 
 }
-getOrderDetail()
-totalPrice()
 
-function refreshWait(){
-  setTimeout(refresh,300)
-}
-
-function refresh(){
-  location.reload()
-}
 onMounted(()=>{
+  getOrderDetail()
+  totalPrice()
 
-  if (location.href.indexOf("#reloaded") === -1) {
-    location.href = location.href + "#reloaded";
-    refreshWait();
-  }
 })
 
 </script>
 
 <template>
+  <div v-if="isLoading" class="loading-container">
+    <div class="loader"></div>
+  </div>
   <el-container class="layout-container">
     <el-header>
       <div>
@@ -125,6 +124,7 @@ onMounted(()=>{
           username
         }}</strong>
       </div>
+      <img src="../assets/logo.png" @click="homepage" :style="{ width: 'auto', height: '70px' }" >
       <div style="display: flex; align-items: center;">
         <el-link v-if="username!==''" @click="MyCart">My Cart </el-link>
         <el-dropdown v-if="username!==''" placement="bottom-end" @command="handleCommand"  >
@@ -159,7 +159,7 @@ onMounted(()=>{
       <div class="cart-table-container" >
         <div v-for="(item, index) in orderDetail">
           <div class="cart-filter-bar-sub" >
-            <span class="switch-cart-sub">Order id: {{ orderDetail[index][0].orderId }}</span>
+            <span class="switch-cart-sub">Order id: {{ item[0].orderId }}</span>
           </div>
           <div class="cart-list-content" >
             <el-table
@@ -182,9 +182,9 @@ onMounted(()=>{
               </el-table-column>
               <el-table-column label="Created Time" width="180" prop="createdTime"></el-table-column>
               <el-table-column label="Operation" width="150">
-                <el-button type="primary" :icon="Money" circle :disabled="orderDetail[index][0].status!==10" @click="payment(orderDetail[index][0].orderId)"></el-button>
-                <el-button type="warning" :icon="CloseBold" circle :disabled="orderDetail[index][0].status!==10" @click="cancelOrder(orderDetail[index][0].orderId )"></el-button>
-                <el-button type="danger" :icon="Delete" circle  @click="deleteOrder(orderDetail[index][0].orderId )"></el-button>
+                <el-button type="primary" :icon="Money" circle :disabled="item[0].status!==10" @click="payment(item[0].orderId)"></el-button>
+                <el-button type="warning" :icon="CloseBold" circle :disabled="item[0].status!==10" @click="cancelOrder(item[0].orderId )"></el-button>
+                <el-button type="danger" :icon="Delete" circle  @click="deleteOrder(item[0].orderId )"></el-button>
               </el-table-column>
               <el-table-column type="expand" prop="itemsDetails">
                 <template v-slot:default="scope">
@@ -198,7 +198,15 @@ onMounted(()=>{
                       show-summary
                       sum-text="Total"
                   >
-                    <el-table-column label="Item Image" width="250" prop="goodImage"></el-table-column>
+                    <el-table-column label="Item Image" width="250" >
+                      <template v-slot:default="scope">
+                        <el-image
+                            :src="imgList[scope.row.goodId].src"
+                            style="width: 120px; height: 120px"
+                        >
+                        </el-image>
+                      </template>
+                    </el-table-column>
                     <el-table-column label="Item Name"  prop="goodName"></el-table-column>
 
                     <el-table-column label="Quantity" width="110" prop="quantity"></el-table-column>
@@ -212,7 +220,7 @@ onMounted(()=>{
 
           </div>
         </div>
-
+        <el-backtop :right="100" :bottom="100" />
         <div class="cart-filter-bar-bottom">
           <div class="bar-bottom-left">
             <el-link @click="homepage">← Homepage</el-link>
@@ -227,6 +235,27 @@ onMounted(()=>{
 </template>
 
 <style scoped>
+@keyframes spinner {
+  to { transform: rotate(360deg); }
+}
+
+.loader {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #3eaf7c; /* Customize the color */
+  border-radius: 50%;
+  animation: spinner 1s linear infinite;
+  margin: 100px auto; /* Center the spinner */
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full height of the viewport */
+}
+
 .layout-container {
   height: 100vh;
   margin: 50px 150px 0px 150px;

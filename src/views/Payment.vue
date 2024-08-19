@@ -8,6 +8,9 @@ import {GetOrderDetail, GetOrderList, UpdateStatus} from "@/api/order.js";
 import { useUserStore } from '@/stores'
 import { useCartStore } from '@/stores'
 import { useOrderStore} from "@/stores";
+import { useImageStore } from '@/stores/index.js';
+const imageStore = useImageStore();
+const imgList = imageStore.imgList;
 const orderStore = useOrderStore();
 const cartStore = useCartStore()
 const userStore = useUserStore()
@@ -23,6 +26,10 @@ const loading = ref(false)
 
 const MyCart = async () => {
   router.push('/onlineShopping/cart')
+}
+
+const Home = async () => {
+  router.push('/onlineShopping')
 }
 
 const pay = async () => {
@@ -75,23 +82,11 @@ const cancelOrder = async (orderId) => {
   await getOrderDetail()
   router.push("/onlineShopping/confirmOrder")
 }
-totalPrice()
-getOrderDetail()
 
-function refreshWait(){
-  setTimeout(refresh,1000)
-}
-
-function refresh(){
-  location.reload()
-}
 
 onMounted(()=>{
-
-  if (location.href.indexOf("#reloaded") === -1) {
-    location.href = location.href + "#reloaded";
-    refreshWait()
-  }
+  totalPrice()
+  getOrderDetail()
 })
 
 </script>
@@ -104,6 +99,7 @@ onMounted(()=>{
           username
         }}</strong>
       </div>
+      <img src="../assets/logo.png" @click="Home" :style="{ width: 'auto', height: '70px' }" >
       <div style="display: flex; align-items: center;">
 
         <el-link v-if="username!==''" @click="MyCart">My Cart </el-link>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -181,7 +177,16 @@ onMounted(()=>{
             style="width: 95%; margin: 0px 0px 30px 20px"
             border
           >
-            <el-table-column label="Item Image" width="250" prop="goodImage"></el-table-column>
+            <el-table-column label="Item Image">
+              <template v-slot:default="scope">
+                <el-image
+                    :src="imgList[scope.row.goodId].src"
+                    style="width: 120px; height: 120px"
+                >
+
+                </el-image>
+              </template>
+            </el-table-column>
             <el-table-column label="Item Name"  prop="goodName"> </el-table-column>
             <el-table-column label="Specification"  >
 <!--              <div  >-->

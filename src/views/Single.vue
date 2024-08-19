@@ -9,6 +9,8 @@ import {useRoute, useRouter} from "vue-router";
 import {useProductStore} from "@/stores/index.js";
 import { useUserStore } from '@/stores'
 import { useCartStore } from '@/stores'
+import { useImageStore } from '@/stores/index.js';
+const imageStore = useImageStore();
 const cartStore = useCartStore()
 const userStore = useUserStore()
 const productStore = useProductStore()
@@ -25,6 +27,8 @@ const searchName = ref({
   categoryName:'',
   name:'',
 })
+
+const imgList = imageStore.imgList;
 
 const sku = ref(0)
 
@@ -43,6 +47,15 @@ const MyCart = async () => {
 
 const MyOrders = async () => {
   router.push('/onlineShopping/order/list')
+}
+
+const Home = async () => {
+  router.push('/onlineShopping')
+}
+
+const Back = async () => {
+  const redirectPath = route.query.redirect || '/';
+  router.push(redirectPath)
 }
 
 function refreshWait(){
@@ -183,7 +196,7 @@ const toConfirmOrder = async () => {
           username
         }}</strong>
       </div>
-
+      <img src="../assets/logo.png" @click="Home" :style="{ width: 'auto', height: '70px' }" >
       <div style="display: flex; align-items: center;">
         <el-link v-if="username===''" @click="login">Login </el-link>
         <el-link  v-if="username!==''" @click="MyCart">My Cart </el-link>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -235,13 +248,16 @@ const toConfirmOrder = async () => {
         <div class="detail_sku_box">
           <el-row >
             <el-col :span="20" >
-              <div class="img_box"><img src="../assets/img_1.png" /></div>
+              <div class="img_box"><img :src="imgList[mockData[sku].id].src" /></div>
+
             </el-col>
+
           </el-row>
+
           <el-col :span="14">
 
             <div>
-              <h2>{{ mockData[sku].name }}</h2>
+              <h2>{{ mockData[0].name }}</h2>
 <!--              <h5>{{ skuItemInfo?.skuInfo?.skuSubtitle }}</h5>-->
               <div>
                 <span >&dollar;{{ mockData[sku].price }}</span>
@@ -261,6 +277,7 @@ const toConfirmOrder = async () => {
               <div style="margin-top: 30px">
                 <el-input-number v-model="info.quantity"/>
               </div>
+
               <div style="margin-top: 50px">
                 <button class="button button2" @click="addCart"><span>Add to Cart</span></button>
                 <button class="button button2" @click="toConfirmOrder"><span>Buy</span></button>
@@ -300,18 +317,21 @@ const toConfirmOrder = async () => {
 <!--        </div>-->
 <!--      </template>-->
     </el-skeleton>
-
-    <el-footer>
+    <el-link type="info" :underline="false" @click="Back" style="position: absolute; bottom: 100px">
+      ← Back
+    </el-link>
+    <el-footer >
       OnlineShop @2024 Created by Jamieson
     </el-footer>
   </el-container>
+
 </template>
 
 <style scoped>
 .layout-container {
-  height: 100vh;
+
   margin: 0px 150px 0px 150px;
-  min-height: 100%;
+  min-height: 100vh;
   .el-aside {
     background-color: #232323;
     &__logo {
@@ -323,6 +343,7 @@ const toConfirmOrder = async () => {
 
   }
   .el-header {
+
     background-color: #fff;
     display: flex;
     align-items: center;
@@ -376,8 +397,8 @@ const toConfirmOrder = async () => {
 
   .img_box img {
     margin: 20px 20px 20px 20px;
-    width: 100%;
-    height: 100%;
+    width: auto;
+    height: 50vh;
   }
 
   .item p {
@@ -447,13 +468,16 @@ const toConfirmOrder = async () => {
     background-color: #1DAEEE;
 
   }
-
   .el-footer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center; /* Center the text horizontally */
     font-size: 14px;
     color: #666;
   }
+
 }
+
 </style>
