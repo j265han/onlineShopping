@@ -53,10 +53,10 @@ function refresh(){
 const handleCommand = async (key) => {
   if (key === 'logout') {
     // 退出操作
-    await ElMessageBox.confirm('你确认要进行退出么', '温馨提示', {
+    await ElMessageBox.confirm('Are you sure you want to Logout', 'warning', {
       type: 'warning',
-      confirmButtonText: '确认',
-      cancelButtonText: '取消'
+      confirmButtonText: 'Confirm',
+      cancelButtonText: 'Cancel'
     })
 
     // 清除本地的数据 (token + user信息)
