@@ -65,16 +65,16 @@ const MyOrders = async () => {
 
 const totalPrice = async () => {
   cartTotalPrice.value = 0
-  console.log(selectionData.value)
+
   if(selectionData.value.length>0){
     selectionData.value.forEach(item => {
       cartTotalPrice.value +=  item.price * item.quantity;
     })
   }
+  cartStore.totalPrice = cartTotalPrice.value.toFixed(2)
 }
 
 const handleSelectionChange = async (data) => {
-  console.log(data)
   selectionData.value = data
 
   await totalPrice();
@@ -95,6 +95,7 @@ const deleteOne = async (id) => {
 const toConfirmOrder = async () => {
   // localStorage.setItem('selectedData', JSON.stringify(selectionData.value))
   cartStore.selectedData = selectionData.value
+
   router.push('/onlineShopping/confirmOrder')
 }
 
@@ -248,7 +249,7 @@ onMounted(()=>{
             <div class="cart-sum">
               <span class="pay-text">Selected Items</span>
               <span class="total-text">Total：</span>
-              <span class="total-symbol">{{ cartTotalPrice }}</span>
+              <span class="total-symbol">{{ cartTotalPrice.toFixed(2) }}</span>
               <div v-if="cartTotalPrice > 0" class="pay-btn-active" @click="toConfirmOrder">
                 Confirm
               </div>

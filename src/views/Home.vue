@@ -90,7 +90,7 @@ const created = async (categoryName) => {
 
   mockData.value = JSON.parse(JSON.stringify(productStore.searchResult))
   isLoading.value=false
-  console.log(mockData)
+
 }
 
 
@@ -264,17 +264,17 @@ const singleProduct = async (id) => {
       <el-icon ></el-icon>
       <span > Suggested Items</span>
     </div>
-    <el-row style="display: flex; justify-content: center; align-items: center;">
+    <el-row >
 
-          <div id="app">
-            <ul v-for="(item,index) in mockData" style="list-style-type:none; padding: 0">
-              <li class="item" @click="singleProduct(item.id)">
-                <div class="img_box"><img v-bind:src="imgList[item.id].src" alt=""></div>
-                <p v-html="item.name"></p>
-                <span >&dollar;{{item.price}}</span>
-              </li>
-            </ul>
-          </div>
+      <div id="app" >
+        <ul v-for="(item,index) in mockData" style="list-style-type:none; padding: 0">
+          <li class="item" @click="singleProduct(item.id)">
+            <div class="img_box"><img v-bind:src="imgList[item.id].src" alt=""></div>
+            <p v-html="item.name"></p>
+            <span >&dollar;{{item.price}}</span>
+          </li>
+        </ul>
+      </div>
 
 
     </el-row>
@@ -308,7 +308,7 @@ const singleProduct = async (id) => {
 }
 .layout-container {
   height: 100vh;
-  margin:50px 150px 0px 150px;
+  margin:50px 10vw 0px 10vw;
   .el-aside {
     background-color: #232323;
     &__logo {
@@ -360,10 +360,10 @@ const singleProduct = async (id) => {
     background-color: #99a9bf;
   }
   #app {
-    width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
-    overflow: hidden;
+    width: 100%;
+    //margin-left: 50px;
+    //margin-right: 50px;
+    //overflow: hidden;
 
     //background: #e3e4e5;
   }

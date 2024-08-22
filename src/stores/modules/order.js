@@ -5,6 +5,7 @@ export const useOrderStore = defineStore(
     'orderInfo',{
         state: () => {
             return {
+                paid: true,
                 orderId: '',
                 orderList: [],
                 orderDetail: []

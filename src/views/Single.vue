@@ -94,6 +94,7 @@ const searchBar = async () => {
   router.push('/onlineShopping/home/search')
 
 }
+console.log(sku.value)
 
 onMounted(() => {
 
@@ -182,6 +183,8 @@ const toConfirmOrder = async () => {
   } else {
     mockData[sku.value].quantity = info.value.quantity
     cartStore.selectedData = Array(mockData[sku.value])
+    console.log(mockData[sku.value])
+    cartStore.totalPrice = info.value.quantity * mockData[sku.value].price
     router.push('/onlineShopping/confirmOrder')
   }
 }

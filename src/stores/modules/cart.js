@@ -7,7 +7,8 @@ export const useCartStore = defineStore(
         state: () => {
             return {
                 selectedData: [],
-                cartList: []
+                cartList: [],
+                totalPrice: 0.00
             }
         },
 

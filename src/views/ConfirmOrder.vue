@@ -19,7 +19,7 @@ const isLoading = ref(true)
 const router = useRouter()
 const userId = localStorage.getItem("username")
 const cartList = JSON.parse(localStorage.getItem("cartList")) ;
-const cartTotalPrice= ref(0.0)
+const cartTotalPrice= cartStore.totalPrice
 const loading = ref(false)
 const selectionData = JSON.parse(JSON.stringify(cartStore.selectedData))
 const username = ref({
@@ -37,14 +37,17 @@ const receiverInfo = ref({
 
 const Home = async () => {
   router.push('/onlineShopping')
+  orderStore.paid = true
 }
 
 const MyCart = async () => {
   router.push('/onlineShopping/cart')
+  orderStore.paid = true
 }
 
 const MyOrders = async () => {
   router.push('/onlineShopping/order/list')
+  orderStore.paid = true
 }
 
 // const getUserInfo = async () => {
@@ -63,6 +66,7 @@ const getGoodId = async () => {
 }
 
 const handleCommand = async (key) => {
+  orderStore.paid = true
   if (key === 'logout') {
     await ElMessageBox.confirm('Are you sure you want to Logout?' , 'Caution', {
       type: 'warning',
@@ -88,36 +92,38 @@ const handleCommand = async (key) => {
 //   await totalPrice()
 // }
 
-const totalPrice = async () => {
-  cartTotalPrice.value = 0
-
-  selectionData.forEach(item => {
-    cartTotalPrice.value +=  item.price * item.quantity;
-  })
-}
+// const totalPrice = async () => {
+//   cartTotalPrice.value = 0
+//
+//   selectionData.forEach(item => {
+//     cartTotalPrice.value +=  item.price * item.quantity;
+//   })
+// }
 
 const buildOrder = async () => {
-  if(selectionData[0].goodId!==null){
-    // const {data} = await BuildOrder(receiverInfo.value)
-    // localStorage.setItem('orderId', data)
-    await orderStore.buildOrderGetId(receiverInfo.value)
-  } else {
+  if (orderStore.paid === true) {
+    if(selectionData[0].goodId!==undefined){
+      // const {data} = await BuildOrder(receiverInfo.value)
+      // localStorage.setItem('orderId', data)
+      await orderStore.buildOrderGetId(receiverInfo.value)
+    } else {
 
-    // const {data} = await BuildOrderDirect(receiverInfo.value)
-    // localStorage.setItem('orderId', data)
-    await orderStore.buildOrderDirectGetId(receiverInfo.value)
+      // const {data} = await BuildOrderDirect(receiverInfo.value)
+      // localStorage.setItem('orderId', data)
+      await orderStore.buildOrderDirectGetId(receiverInfo.value)
+    }
   }
-
 
   // localStorage.setItem('userInfo', JSON.stringify( receiverInfo.value))
   router.push('/onlineShopping/payment')
 }
 
-totalPrice()
+// totalPrice()
 // getUserInfo()
 
 onMounted(()=>{
   getGoodId()
+
 })
 
 
@@ -245,7 +251,7 @@ onMounted(()=>{
             <el-table-column label="Picture" width="180">
               <template v-slot:default="scope">
                 <el-image
-                    :src="imgList[scope.row.goodId].src"
+                    :src="imgList[scope.row.specList[0].goodsId].src"
                     style="width: 120px; height: 120px"
                 >
                 </el-image>

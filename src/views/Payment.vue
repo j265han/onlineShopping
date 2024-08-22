@@ -16,10 +16,13 @@ const cartStore = useCartStore()
 const userStore = useUserStore()
 const router = useRouter()
 const username = JSON.parse(JSON.stringify(userStore.username))
-const orderDetail = Array(JSON.parse(JSON.stringify(orderStore.orderDetail)))
+// const orderDetail = Array(JSON.parse(JSON.stringify(orderStore.orderDetail)))
+const orderDetail = ref([])
+const itemDetail = ref([])
 const orderId = JSON.parse(JSON.stringify(orderStore.orderId))
-const cartTotalPrice= ref(0.0)
+const cartTotalPrice= cartStore.totalPrice
 const loading = ref(false)
+const isLoading = ref(true)
 // const selectionData = JSON.parse(localStorage.getItem("selectedData"))
 //
 // const userInfo = JSON.parse(localStorage.getItem("userInfo"))
@@ -34,6 +37,7 @@ const Home = async () => {
 
 const pay = async () => {
   const status = 20
+  orderStore.paid = true
   await UpdateStatus({orderId , status})
   router.push('/onlineShopping/paymentDone')
 }
@@ -64,20 +68,24 @@ const handleCommand = async (key) => {
   }
 }
 
-const totalPrice = async () => {
-  cartTotalPrice.value = 0
-  console.log(orderDetail)
-  orderDetail[0].itemsDetails.forEach(item => {
-    cartTotalPrice.value +=  item.totalPrice;
-  })
-}
+// const totalPrice = async () => {
+//   cartTotalPrice.value = 0
+//
+//   orderDetail[0].itemsDetails.forEach(item => {
+//     cartTotalPrice.value +=  item.totalPrice;
+//   })
+// }
 
 const getOrderDetail = async () => {
   await orderStore.getOrderDetail({orderId})
+  orderDetail.value = Array(JSON.parse(JSON.stringify(orderStore.orderDetail)))
+  itemDetail.value = orderDetail.value[0].itemsDetails
+  isLoading.value = false
 }
 
 const cancelOrder = async (orderId) => {
   const status=0
+  orderStore.paid = false
   await UpdateStatus({orderId , status})
   await getOrderDetail()
   router.push("/onlineShopping/confirmOrder")
@@ -85,13 +93,17 @@ const cancelOrder = async (orderId) => {
 
 
 onMounted(()=>{
-  totalPrice()
+
   getOrderDetail()
+  // totalPrice()
 })
 
 </script>
 
 <template>
+  <div v-if="isLoading" class="loading-container">
+    <div class="loader"></div>
+  </div>
   <el-container class="layout-container">
     <el-header>
       <div>
@@ -171,7 +183,7 @@ onMounted(()=>{
           </el-table>
           <el-table
             ref="item"
-            :data="orderDetail[0].itemsDetails"
+            :data="itemDetail"
             v-loading="loading"
             size="default"
             style="width: 95%; margin: 0px 0px 30px 20px"
@@ -230,6 +242,26 @@ onMounted(()=>{
 </template>
 
 <style scoped>
+@keyframes spinner {
+  to { transform: rotate(360deg); }
+}
+
+.loader {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #3eaf7c; /* Customize the color */
+  border-radius: 50%;
+  animation: spinner 1s linear infinite;
+  margin: 100px auto; /* Center the spinner */
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full height of the viewport */
+}
 .layout-container {
   height: 100vh;
   margin: 50px 150px 0px 150px;
