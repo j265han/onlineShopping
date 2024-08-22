@@ -133,7 +133,7 @@ onMounted(()=>{
   <div v-if="isLoading" class="loading-container">
     <div class="loader"></div>
   </div>
-  <el-container class="layout-container">
+  <el-container class="layout-container" v-else>
     <el-header>
       <div>
         Hello! <strong>{{

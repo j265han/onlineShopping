@@ -141,7 +141,7 @@ const singleProduct = async (id) => {
   <div v-if="isLoading" class="loading-container">
     <div class="loader"></div>
   </div>
-  <el-container class="layout-container">
+  <el-container class="layout-container" v-else>
     <el-header >
       <div>
         Hello! <strong>{{
@@ -149,7 +149,7 @@ const singleProduct = async (id) => {
         }}</strong>
       </div>
 
-      <img src="../assets/logo.png" @click="Home" :style="{ width: 'auto', height: '70px' }" >
+      <img src="../assets/logo.png" :style="{ width: 'auto', height: '70px' }" >
 
       <div style="display: flex; align-items: center;">
         <el-link v-if="username===''" @click="login">Login </el-link>
