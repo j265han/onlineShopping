@@ -1,6 +1,6 @@
 <script setup>
 
-import {CaretBottom, EditPen, SwitchButton} from "@element-plus/icons-vue";
+import {CaretBottom, EditPen, SwitchButton, User} from "@element-plus/icons-vue";
 import {useRoute, useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
 import {ElMessageBox} from "element-plus";
@@ -34,7 +34,14 @@ const receiverInfo = ref({
   quantity:selectionData[0].quantity,
   goodId:[]
 })
-
+const rules = {
+  receiverPhone: [
+    {required: true, message: 'Please enter PhoneNo.', trigger: 'blur'},
+  ],
+  receiverAddress: [
+    {required: true, message: 'Please enter Address', trigger: 'blur'},
+  ]
+}
 const Home = async () => {
   router.push('/onlineShopping')
   orderStore.paid = true
@@ -101,21 +108,29 @@ const handleCommand = async (key) => {
 // }
 
 const buildOrder = async () => {
-  if (orderStore.paid === true) {
-    if(selectionData[0].goodId!==undefined){
-      // const {data} = await BuildOrder(receiverInfo.value)
-      // localStorage.setItem('orderId', data)
-      await orderStore.buildOrderGetId(receiverInfo.value)
-    } else {
+  if (receiverInfo.value.receiverPhone == null || receiverInfo.value.receiverAddress == null) {
+    await ElMessageBox.confirm('Receiver PhoneNo. and Address cannot be empty', 'Warning', {
+      type: 'warning',
+      confirmButtonText: 'Ok',
+    })
+  } else {
+    if (orderStore.paid === true) {
+      if(selectionData[0].goodId!==undefined){
+        // const {data} = await BuildOrder(receiverInfo.value)
+        // localStorage.setItem('orderId', data)
+        await orderStore.buildOrderGetId(receiverInfo.value)
+      } else {
 
-      // const {data} = await BuildOrderDirect(receiverInfo.value)
-      // localStorage.setItem('orderId', data)
-      await orderStore.buildOrderDirectGetId(receiverInfo.value)
+        // const {data} = await BuildOrderDirect(receiverInfo.value)
+        // localStorage.setItem('orderId', data)
+        await orderStore.buildOrderDirectGetId(receiverInfo.value)
+      }
     }
+
+    // localStorage.setItem('userInfo', JSON.stringify( receiverInfo.value))
+    router.push('/onlineShopping/payment')
   }
 
-  // localStorage.setItem('userInfo', JSON.stringify( receiverInfo.value))
-  router.push('/onlineShopping/payment')
 }
 
 // totalPrice()
@@ -192,7 +207,9 @@ onMounted(()=>{
           <span class="switch-cart-sub">Receiver Info</span>
         </div>
         <div class="cart-list-content">
+          <el-form :model="receiverInfo" :rules="rules" ref="formRef" label-width="100px">
           <el-table
+              :rules="rules"
               ref="cartTable"
               :data="userInfo"
               v-loading="loading"
@@ -210,8 +227,8 @@ onMounted(()=>{
             <el-table-column label="Phone No." width="180">
               <template v-slot:default>
                 <el-input
-                    v-model="receiverInfo.receiverPhone"
-                ></el-input>
+                    v-model="receiverInfo.receiverPhone"  >
+                </el-input>
               </template>
             </el-table-column>
             <el-table-column label="Receiver Address" >
@@ -221,10 +238,9 @@ onMounted(()=>{
                 ></el-input>
               </template>
             </el-table-column>
-<!--            <el-table-column label="Quantity" width="220" prop="quantity"> </el-table-column>-->
-<!--            <el-table-column label="Total Price"></el-table-column>-->
-
           </el-table>
+          </el-form>
+
           <div class="cart-filter-bar-bottom">
             <div class="bar-bottom-left">
             </div>
@@ -311,6 +327,7 @@ onMounted(()=>{
   align-items: center;
   height: 100vh; /* Full height of the viewport */
 }
+
 .layout-container {
   height: 100vh;
   margin: 0px 150px 0px 150px;
@@ -393,6 +410,11 @@ onMounted(()=>{
     max-height: 100vh;
     padding-bottom: 30px;
     overflow-y: auto;
+
+
+  }
+  .el-form-item.custom-form-item .el-form-item__content  {
+    margin-left: 0;
   }
 
   .cart-filter-bar .cart-sum {

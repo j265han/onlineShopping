@@ -65,7 +65,7 @@ const register = async () => {
   const res = await userRegisterService(formModel.value)
   alert(res.message)
   isRegister.value = false
-  router.push('/onlineShopping/login')
+  router.push('/onlineShopping/user/login')
 }
 
 const router = useRouter()
@@ -86,7 +86,7 @@ const login = async () => {
     userStore.token = token
     userStore.username = formModel.value.username
     localStorage.setItem('token', token)
-    const {data } = await ConfirmInfo({ username: JSON.parse(formModel.value.username)})
+    const {data } = await ConfirmInfo({ username: formModel.value.username})
     // // localStorage.setItem("userInfo",JSON.stringify(data))
     userStore.userInfo = data
     // localStorage.setItem('username', formModel.value.username)
